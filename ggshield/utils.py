@@ -127,7 +127,7 @@ def get_lines_from_patch(content: str, filemode: Filemode) -> Iterable[Line]:
             post_index = int(m.groupdict()["post_index"])
             line_content = m.groupdict()["line_content"][:-1]
 
-            if filemode == Filemode.NEW or filemode == Filemode.DELETE:
+            if filemode in [Filemode.NEW, Filemode.DELETE]:
                 pre_index = 1
                 post_index = 1
 

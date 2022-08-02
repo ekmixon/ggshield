@@ -36,7 +36,7 @@ def docker_pull_image(image_name: str, timeout: int) -> None:
     except subprocess.CalledProcessError:
         raise click.ClickException(f'Image "{image_name}" not found')
     except subprocess.TimeoutExpired:
-        raise click.ClickException('Command "{}" timed out'.format(" ".join(command)))
+        raise click.ClickException(f'Command "{" ".join(command)}" timed out')
 
 
 def docker_save_to_tmp(image_name: str, destination_path: Path, timeout: int) -> None:
@@ -67,7 +67,7 @@ def docker_save_to_tmp(image_name: str, destination_path: Path, timeout: int) ->
             f"Unable to save docker archive:\nError: {err_string}"
         )
     except subprocess.TimeoutExpired:
-        raise click.ClickException('Command "{}" timed out'.format(" ".join(command)))
+        raise click.ClickException(f'Command "{" ".join(command)}" timed out')
 
 
 def docker_scan_archive(

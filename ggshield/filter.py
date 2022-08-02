@@ -44,11 +44,9 @@ def is_ignored(
     ]
     if not all_policies and policy_break.policy.lower() != "secrets detection":
         return True
-    if get_ignore_sha(policy_break) in matches_ignore or any(
+    return get_ignore_sha(policy_break) in matches_ignore or any(
         match.match in matches_ignore for match in policy_break.matches
-    ):
-        return True
-    return False
+    )
 
 
 def remove_ignored_from_result(
@@ -115,13 +113,12 @@ def leak_dictionary_by_ignore_sha(
     matches that start on said line.
     """
     policy_breaks.sort(
-        key=lambda x: min(  # type: ignore
-            (match.index_start if match.index_start else -1 for match in x.matches)
-        )
+        key=lambda x: min(match.index_start or -1 for match in x.matches)
     )
+
     sha_dict: Dict[str, List[PolicyBreak]] = OrderedDict()
     for policy_break in policy_breaks:
-        policy_break.matches.sort(key=lambda x: x.index_start if x.index_start else -1)
+        policy_break.matches.sort(key=lambda x: x.index_start or -1)
         ignore_sha = get_ignore_sha(policy_break)
         sha_dict.setdefault(ignore_sha, []).append(policy_break)
 
@@ -142,11 +139,7 @@ def translate_user_pattern(pattern: str) -> str:
     # Handle start/end of pattern
     if pattern[-1] != "/":
         pattern += "$"
-    if pattern[0] == "/":
-        pattern = "^" + pattern[1:]
-    else:
-        pattern = "(^|/)" + pattern
-
+    pattern = f"^{pattern[1:]}" if pattern[0] == "/" else f"(^|/){pattern}"
     # Replace * and ** sequences
     pattern = re.sub(r"\\\*\\\*/", "([^/]+/)*", pattern)
     pattern = re.sub(r"\\\*", "([^/]+)", pattern)

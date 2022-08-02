@@ -224,7 +224,7 @@ def scan_commit_range(
     scan_id: str,
     mode_header: str,
     banlisted_detectors: Optional[Set[str]] = None,
-) -> int:  # pragma: no cover
+) -> int:    # pragma: no cover
     """
     Scan every commit in a range.
 
@@ -234,8 +234,8 @@ def scan_commit_range(
     """
     return_code = 0
     with concurrent.futures.ThreadPoolExecutor(
-        max_workers=min(CPU_COUNT, 4)
-    ) as executor:
+            max_workers=min(CPU_COUNT, 4)
+        ) as executor:
         future_to_process = [
             executor.submit(
                 scan_commit,
@@ -253,13 +253,11 @@ def scan_commit_range(
 
         scans: List[ScanCollection] = []
         with click.progressbar(
-            iterable=concurrent.futures.as_completed(future_to_process),
-            length=len(future_to_process),
-            label=format_text("Scanning Commits", STYLE["progress"]),
-        ) as completed_futures:
-            for future in completed_futures:
-                scans.append(future.result())
-
+                    iterable=concurrent.futures.as_completed(future_to_process),
+                    length=len(future_to_process),
+                    label=format_text("Scanning Commits", STYLE["progress"]),
+                ) as completed_futures:
+            scans.extend(future.result() for future in completed_futures)
         return_code = output_handler.process_scan(
             ScanCollection(id=scan_id, type="commit-range", scans=scans)
         )

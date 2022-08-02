@@ -120,7 +120,7 @@ def leak_message_located(
                 line_content = clip_long_line(line_content, max_width, after=True)
             leak_msg.write(f"{display_patch(line_content)}\n")
 
-        old_line_number = multiline_end if multiline_end else line_number
+        old_line_number = multiline_end or line_number
 
     return leak_msg.getvalue()
 
@@ -132,12 +132,12 @@ def flatten_policy_breaks_by_line(
     flatten_policy_breaks_by_line flatens a list of occurrences with the
     same ignore SHA into a dict of incidents.
     """
-    flat_match_dict: Dict[int, List[Match]] = dict()
+    flat_match_dict: Dict[int, List[Match]] = {}
     for policy_break in policy_breaks:
         for match in policy_break.matches:
             flat_match_list = flat_match_dict.get(match.line_start)
-            if flat_match_list and not any(
-                match.index_start == flat_match.index_start
+            if flat_match_list and all(
+                match.index_start != flat_match.index_start
                 for flat_match in flat_match_list
             ):
                 flat_match_list.append(match)
@@ -159,16 +159,7 @@ def policy_break_header(
         else ""
     )
 
-    return "\n{} Incident {}({}): {}{} (Ignore with SHA: {}) ({} {})\n".format(
-        format_text(">>>", STYLE["detector_line_start"]),
-        issue_n,
-        format_text(policy_breaks[0].policy, STYLE["detector"]),
-        format_text(policy_breaks[0].break_type, STYLE["detector"]),
-        validity_msg,
-        format_text(ignore_sha, STYLE["ignore_sha"]),
-        len(policy_breaks),
-        pluralize("occurrence", len(policy_breaks), "occurrences"),
-    )
+    return f'\n{format_text(">>>", STYLE["detector_line_start"])} Incident {issue_n}({format_text(policy_breaks[0].policy, STYLE["detector"])}): {format_text(policy_breaks[0].break_type, STYLE["detector"])}{validity_msg} (Ignore with SHA: {format_text(ignore_sha, STYLE["ignore_sha"])}) ({len(policy_breaks)} {pluralize("occurrence", len(policy_breaks), "occurrences")})\n'
 
 
 def clip_long_line(
@@ -182,9 +173,9 @@ def clip_long_line(
     Add a "…" character before and/or after the given string
     if it exceeds a maximum length.
     """
-    ellipsis = "…"
     content_length = len(content)
     if content_length > max_length:
+        ellipsis = "…"
         if before and after and content_length > max_length + 1:
             content = (
                 ellipsis
@@ -281,14 +272,14 @@ def display_detector(detector: str, offset: int) -> str:
 def format_detector(match_type: str, index_start: int, index_end: int) -> str:
     """Return detector object to add in detector_line."""
 
-    detector_size = len(match_type)
     secret_size = index_end - index_start
 
     display = ""
     if secret_size < MAX_SECRET_SIZE:
+        detector_size = len(match_type)
         before = "_" * max(1, int(((secret_size - detector_size) - 1) / 2))
         after = "_" * max(1, (secret_size - len(before) - detector_size) - 2)
-        display = "|{}{}{}|".format(before, match_type, after)
+        display = f"|{before}{match_type}{after}|"
 
     return " " * index_start + format_text(display, STYLE["detector"]) + "\n"
 
@@ -299,12 +290,7 @@ def secrets_engine_version() -> str:
 
 def file_info(filename: str, nb_secrets: int) -> str:
     """Return the formatted file info (number of secrets + filename)."""
-    return "\n{} {} {} been found in file {}\n".format(
-        ICON_BY_OS.get(os.name, ICON_BY_OS["default"]),
-        format_text(str(nb_secrets), STYLE["nb_secrets"]),
-        pluralize("incident has", nb_secrets, "incidents have"),
-        format_text(filename, STYLE["filename"]),
-    )
+    return f'\n{ICON_BY_OS.get(os.name, ICON_BY_OS["default"])} {format_text(str(nb_secrets), STYLE["nb_secrets"])} {pluralize("incident has", nb_secrets, "incidents have")} been found in file {format_text(filename, STYLE["filename"])}\n'
 
 
 def no_leak_message() -> str:

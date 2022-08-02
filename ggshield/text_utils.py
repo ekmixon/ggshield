@@ -87,9 +87,7 @@ def format_text(text: str, style: Dict[str, Any]) -> str:
 
 
 def pluralize(name: str, nb: int, plural: Union[str, None] = None) -> str:
-    if nb == 1:
-        return name
-    return plural or (name + "s")
+    return name if nb == 1 else plural or f"{name}s"
 
 
 def format_line_count(line_count: Union[int, None], padding: int) -> str:

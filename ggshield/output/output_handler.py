@@ -51,6 +51,4 @@ class OutputHandler(ABC):
     def _get_exit_code(scan: ScanCollection) -> int:
         if scan.results:
             return 1
-        if scan.scans and any(x.results for x in scan.scans):
-            return 1
-        return 0
+        return 1 if scan.scans and any(x.results for x in scan.scans) else 0

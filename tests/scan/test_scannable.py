@@ -162,7 +162,7 @@ def test_patch_separation_ignore():
     files = list(c.get_files())
 
     assert len(files) == 3
-    assert not (any(entry.filename == file_to_ignore for entry in files))
+    assert all(entry.filename != file_to_ignore for entry in files)
 
 
 def test_patch_max_size():
@@ -179,4 +179,4 @@ CHECK_ENVIRONMENT=true
     c._patch += "a" * MAX_FILE_SIZE
     files = list(c.get_files())
 
-    assert len(files) == 0
+    assert not files

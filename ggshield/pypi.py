@@ -41,7 +41,7 @@ def save_package_to_tmp(temp_dir: str, package_name: str) -> None:
         raise click.ClickException(f'Failed to download "{package_name}"')
 
     except subprocess.TimeoutExpired:
-        raise click.ClickException('Command "{}" timed out'.format(" ".join(command)))
+        raise click.ClickException(f'Command "{" ".join(command)}" timed out')
 
 
 def get_files_from_package(

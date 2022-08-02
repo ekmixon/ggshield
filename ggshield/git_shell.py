@@ -94,7 +94,7 @@ def shell(command: List[str], timeout: int = COMMAND_TIMEOUT) -> str:
     except subprocess.CalledProcessError:
         pass
     except subprocess.TimeoutExpired:
-        raise click.Abort('Command "{}" timed out'.format(" ".join(command)))
+        raise click.Abort(f'Command "{" ".join(command)}" timed out')
     except Exception as exc:
         raise click.ClickException(
             f"Unhandled exception: {' '.join(command)}\n\t{str(exc)}"

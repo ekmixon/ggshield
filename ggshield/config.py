@@ -64,13 +64,14 @@ class Config:
             Attribute("api_url", "https://api.gitguardian.com"),
             Attribute("banlisted_detectors", set()),
             Attribute("exit_zero", False),
-            Attribute("matches_ignore", list()),
+            Attribute("matches_ignore", []),
             Attribute("max_commits_for_hook", 50),
             Attribute("paths_ignore", set()),
             Attribute("show_secrets", False),
             Attribute("verbose", False),
             Attribute("ignore_default_excludes", False),
         ]
+
 
         for attr in self.attributes:
             setattr(self, attr.name, attr.default)
@@ -96,7 +97,7 @@ class Config:
                 else:
                     setattr(self, key, item)
             else:
-                click.echo("Unrecognized key in config: {}".format(key))
+                click.echo(f"Unrecognized key in config: {key}")
 
     def load_config(self, filename: str) -> bool:
         if not os.path.isfile(filename):
@@ -269,7 +270,7 @@ class Cache:
 
                 setattr(self, key, item)
             else:
-                click.echo("Unrecognized key in cache: {}".format(key))
+                click.echo(f"Unrecognized key in cache: {key}")
 
     def to_dict(self) -> Dict[str, Any]:
         _cache = {key: getattr(self, key) for key in self.get_attributes_keys()}
@@ -310,8 +311,8 @@ class Cache:
     def add_found_policy_break(self, policy_break: PolicyBreak, filename: str) -> None:
         if policy_break.is_secret:
             ignore_sha = get_ignore_sha(policy_break)
-            if not any(
-                last_found["match"] == ignore_sha
+            if all(
+                last_found["match"] != ignore_sha
                 for last_found in self.last_found_secrets
             ):
                 self.last_found_secrets.append(

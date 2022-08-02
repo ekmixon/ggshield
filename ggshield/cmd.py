@@ -122,8 +122,6 @@ def scan(
 ) -> int:
     """Command to scan various contents."""
     ctx.obj["client"] = retrieve_client(ctx.obj["config"])
-    return_code = 0
-
     paths_ignore = ctx.obj["config"].paths_ignore
     if exclude is not None:
         paths_ignore.update(exclude)
@@ -149,8 +147,7 @@ def scan(
     if banlist_detector:
         config.banlisted_detectors.update(banlist_detector)
 
-    max_commits = get_max_commits_for_hook()
-    if max_commits:
+    if max_commits := get_max_commits_for_hook():
         config.max_commits_for_hook = max_commits
 
     output_handler_cls: Type[OutputHandler] = TextOutputHandler
@@ -161,7 +158,7 @@ def scan(
         show_secrets=config.show_secrets, verbose=config.verbose, output=output
     )
 
-    return return_code
+    return 0
 
 
 scan = cast(click.Group, json_output_option_decorator(scan))

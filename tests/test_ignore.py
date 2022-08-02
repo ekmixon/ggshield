@@ -38,7 +38,7 @@ def test_cache_catches_last_found_secrets(client, isolated_fs):
     setattr(config, "matches_ignore", [])
     cache = Cache()
     cache.purge()
-    assert cache.last_found_secrets == list()
+    assert cache.last_found_secrets == []
 
     with my_vcr.use_cassette("multiple_secrets"):
         c.scan(
@@ -49,7 +49,7 @@ def test_cache_catches_last_found_secrets(client, isolated_fs):
             verbose=False,
             mode_header="test",
         )
-    assert config.matches_ignore == list()
+    assert config.matches_ignore == []
 
     cache_found_secrets = sorted(cache.last_found_secrets, key=compare_matches_ignore)
     found_secrets = sorted(FOUND_SECRETS, key=compare_matches_ignore)
@@ -133,7 +133,7 @@ def test_ignore_last_found(client, isolated_fs):
     THEN config ignored-matches is updated accordingly
     """
     config = Config()
-    setattr(config, "matches_ignore", list())
+    setattr(config, "matches_ignore", [])
 
     cache = Cache()
     cache.last_found_secrets = FOUND_SECRETS
@@ -236,7 +236,7 @@ def test_ignore_last_found_preserve_previous_config(client, isolated_fs):
 
     assert matches_ignore == found_secrets
     assert config.paths_ignore == previous_paths
-    assert config.exit_zero is True
+    assert config.exit_zero
 
 
 @patch("ggshield.config.Config.CONFIG_LOCAL", [DOT_GITGUARDIAN_YAML])  # nosec

@@ -101,10 +101,9 @@ class TestListPackageFiles:
 
             unpack_kwargs = {"format": "zip"} if extension == "whl" else {}
             unpack_archive_mock.assert_called_once_with(
-                str(archive_path),
-                extract_dir=Path(self.tmp_dir),
-                **unpack_kwargs,
+                archive_path, extract_dir=Path(self.tmp_dir), **unpack_kwargs
             )
+
 
             expected_exclusion_regexes = self.exclusion_regexes
             expected_exclusion_regexes.add(

@@ -103,8 +103,7 @@ def generate_files_from_paths(paths: Iterable[str], verbose: bool) -> Iterable[F
             continue
         with open(path, "r") as file:
             try:
-                content = file.read()
-                if content:
+                if content := file.read():
                     yield File(content, file.name, file_size)
             except UnicodeDecodeError:
                 pass

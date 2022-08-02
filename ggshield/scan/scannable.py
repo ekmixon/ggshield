@@ -43,9 +43,7 @@ class ScanCollection(NamedTuple):
 
     @property
     def scans_with_results(self) -> List["ScanCollection"]:
-        if self.scans:
-            return [scan for scan in self.scans if scan.results]
-        return []
+        return [scan for scan in self.scans if scan.results] if self.scans else []
 
     def get_all_results(self) -> Iterable[Result]:
         """Returns an iterable on all results and sub-scan results"""
@@ -63,7 +61,7 @@ class File:
         self.document = document
         self.filename = filename
         self.filemode = Filemode.FILE
-        self.filesize = filesize if filesize else len(self.document.encode("utf-8"))
+        self.filesize = filesize or len(self.document.encode("utf-8"))
 
     @property
     def scan_dict(self) -> Dict[str, Any]:
@@ -123,9 +121,10 @@ class Files:
         cache.purge()
         scannable_list = self.scannable_list
         results = []
-        chunks = []
-        for i in range(0, len(scannable_list), MULTI_DOCUMENT_LIMIT):
-            chunks.append(scannable_list[i : i + MULTI_DOCUMENT_LIMIT])
+        chunks = [
+            scannable_list[i : i + MULTI_DOCUMENT_LIMIT]
+            for i in range(0, len(scannable_list), MULTI_DOCUMENT_LIMIT)
+        ]
 
         with concurrent.futures.ThreadPoolExecutor(
             max_workers=min(CPU_COUNT, 4), thread_name_prefix="content_scan"

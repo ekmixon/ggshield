@@ -29,12 +29,12 @@ def jenkins_range(verbose: bool) -> List[str]:  # pragma: no cover
         )
 
     if previous_commit:
-        commit_list = get_list_commit_SHA(f"{previous_commit}...{head_commit}")
-        if commit_list:
+        if commit_list := get_list_commit_SHA(
+            f"{previous_commit}...{head_commit}"
+        ):
             return commit_list
 
-    commit_list = get_list_commit_SHA(f"{head_commit}~1...")
-    if commit_list:
+    if commit_list := get_list_commit_SHA(f"{head_commit}~1..."):
         return commit_list
 
     raise click.ClickException(
@@ -55,12 +55,10 @@ def travis_range(verbose: bool) -> List[str]:  # pragma: no cover
         )
 
     if commit_range:
-        commit_list = get_list_commit_SHA(commit_range)
-        if commit_list:
+        if commit_list := get_list_commit_SHA(commit_range):
             return commit_list
 
-    commit_list = get_list_commit_SHA("{}~1...".format(commit_sha))
-    if commit_list:
+    if commit_list := get_list_commit_SHA(f"{commit_sha}~1..."):
         return commit_list
 
     raise click.ClickException(
@@ -76,8 +74,7 @@ def bitbucket_pipelines_range(verbose: bool) -> List[str]:  # pragma: no cover
     if verbose:
         click.echo(f"BITBUCKET_COMMIT: {commit_sha}")
 
-    commit_list = get_list_commit_SHA("{}~1...".format(commit_sha))
-    if commit_list:
+    if commit_list := get_list_commit_SHA(f"{commit_sha}~1..."):
         return commit_list
 
     raise click.ClickException(
@@ -87,7 +84,7 @@ def bitbucket_pipelines_range(verbose: bool) -> List[str]:  # pragma: no cover
     )
 
 
-def circle_ci_range(verbose: bool) -> List[str]:  # pragma: no cover
+def circle_ci_range(verbose: bool) -> List[str]:    # pragma: no cover
     """
     # Extract commit range (or single commit)
     COMMIT_RANGE=$(echo "${CIRCLE_COMPARE_URL}" | cut -d/ -f7)
@@ -104,12 +101,10 @@ def circle_ci_range(verbose: bool) -> List[str]:  # pragma: no cover
         click.echo(f"CIRCLE_RANGE: {compare_range}\nCIRCLE_SHA1: {commit_sha}")
 
     if compare_range and not compare_range.startswith("..."):
-        commit_list = get_list_commit_SHA(compare_range)
-        if commit_list:
+        if commit_list := get_list_commit_SHA(compare_range):
             return commit_list
 
-    commit_list = get_list_commit_SHA("{}~1...".format(commit_sha))
-    if commit_list:
+    if commit_list := get_list_commit_SHA(f"{commit_sha}~1..."):
         return commit_list
 
     raise click.ClickException(
@@ -133,19 +128,16 @@ def gitlab_ci_range(verbose: bool) -> List[str]:  # pragma: no cover
         )
 
     if before_sha and before_sha != EMPTY_SHA:
-        commit_list = get_list_commit_SHA("{}~1...".format(before_sha))
-        if commit_list:
+        if commit_list := get_list_commit_SHA(f"{before_sha}~1..."):
             return commit_list
 
     if merge_request_target_branch and merge_request_target_branch != EMPTY_SHA:
-        commit_list = get_list_commit_SHA(
-            "origin/{}...".format(merge_request_target_branch)
-        )
-        if commit_list:
+        if commit_list := get_list_commit_SHA(
+            f"origin/{merge_request_target_branch}..."
+        ):
             return commit_list
 
-    commit_list = get_list_commit_SHA("{}~1...".format(commit_sha))
-    if commit_list:
+    if commit_list := get_list_commit_SHA(f"{commit_sha}~1..."):
         return commit_list
 
     raise click.ClickException(
@@ -174,28 +166,23 @@ def github_actions_range(verbose: bool) -> List[str]:  # pragma: no cover
         )
 
     if push_before_sha and push_before_sha != EMPTY_SHA:
-        commit_list = get_list_commit_SHA("{}...".format(push_before_sha))
-        if commit_list:
+        if commit_list := get_list_commit_SHA(f"{push_before_sha}..."):
             return commit_list
 
     if pull_req_base_sha and pull_req_base_sha != EMPTY_SHA:
-        commit_list = get_list_commit_SHA("{}..".format(pull_req_base_sha))
-        if commit_list:
+        if commit_list := get_list_commit_SHA(f"{pull_req_base_sha}.."):
             return commit_list
 
     if push_base_sha and push_base_sha != "null":
-        commit_list = get_list_commit_SHA("{}...".format(push_base_sha))
-        if commit_list:
+        if commit_list := get_list_commit_SHA(f"{push_base_sha}..."):
             return commit_list
 
     if default_branch:
-        commit_list = get_list_commit_SHA("{}...".format(default_branch))
-        if commit_list:
+        if commit_list := get_list_commit_SHA(f"{default_branch}..."):
             return commit_list
 
     if head_sha:
-        commit_list = get_list_commit_SHA("{}~1...".format(head_sha))
-        if commit_list:
+        if commit_list := get_list_commit_SHA(f"{head_sha}~1..."):
             return commit_list
 
     raise click.ClickException(
@@ -216,8 +203,7 @@ def drone_range(verbose: bool) -> List[str]:  # pragma: no cover
         click.echo(f"DRONE_COMMIT_BEFORE: {before_sha}\n")
 
     if before_sha and before_sha != EMPTY_SHA:
-        commit_list = get_list_commit_SHA("{}..".format(before_sha))
-        if commit_list:
+        if commit_list := get_list_commit_SHA(f"{before_sha}.."):
             return commit_list
 
     raise click.ClickException(
@@ -234,8 +220,7 @@ def azure_range(verbose: bool) -> List[str]:  # pragma: no cover
         click.echo(f"BUILD_SOURCEVERSION: {head_commit}\n")
 
     if head_commit:
-        commit_list = get_list_commit_SHA("{}~1...".format(head_commit))
-        if commit_list:
+        if commit_list := get_list_commit_SHA(f"{head_commit}~1..."):
             return commit_list
 
     raise click.ClickException(
